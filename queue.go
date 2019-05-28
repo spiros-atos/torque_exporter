@@ -205,10 +205,10 @@ func squeueLineParser(line string) []string {
 	// result = append(result, strings.TrimSpace(line[20*(qFIELDS-1):]))
 
 	start := 0
-	for idx, nc := range nchars {
+	for _, nc := range nchars {
 		end := start + nc
 		result = append(result, strings.TrimSpace(line[start:end+1]))
-		start := end+1
+		start = end+1
 	}
 	result = append(result, strings.TrimSpace(line[start:]))
 
