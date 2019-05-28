@@ -25,16 +25,45 @@ import (
 )
 
 const (
-	qJOBID      = iota
-	qNAME       = iota
-	qUSERNAME   = iota
-	qPARTITION  = iota
-	qNUMCPUS    = iota
-	qSUBMITTIME = iota
-	qSTARTTIME  = iota
-	qSTATE      = iota
-	qFIELDS     = iota
+	// qJOBID      = iota
+	// qNAME       = iota
+	// qUSERNAME   = iota
+	// qPARTITION  = iota
+	// qNUMCPUS    = iota
+	// qSUBMITTIME = iota
+	// qSTARTTIME  = iota
+	// qSTATE      = iota
+	// qFIELDS     = iota
+	qJOBID			= iota
+	qS 				= iota
+	qCCODE         	= iota
+	qPAR  			= iota
+	qEFFIC  		= iota
+	qXFACTOR  		= iota
+	qQ  			= iota
+	qUSERNAME    	= iota
+	qGROUP          = iota
+	qMHOST 			= iota
+	qPROCS    		= iota
+	qWALLTIME       = iota
+	qCOMPLETIONTIME	= iota
+	qFIELDS 		= iota
 )
+
+// JOBID               (15)+5
+// S (1)+1
+// CCODE         (9)+5
+// PAR  (2)+3
+// EFFIC  (2)+5
+// XFACTOR  (2)+7
+// Q  (2)+1
+// USERNAME    (4)+8
+// GROUP            (12)+5
+// MHOST (1)+5
+// PROCS    (4)+5
+// WALLTIME        (8)+8
+// COMPLETIONTIME
+
 
 const (
 	slurmLayout   = time.RFC3339
@@ -83,9 +112,9 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 // spiros start
 	var buffer := sshSession.OutBuffer
 	line, error := buffer.ReadString('\n')	// new line
-	line, error := buffer.ReadString('\n')	// completed jobs-----
-	line, error := buffer.ReadString('\n')	// new line
-	line, error := buffer.ReadString('\n')	// header line...
+	line, error = buffer.ReadString('\n')	// completed jobs-----
+	line, error = buffer.ReadString('\n')	// new line
+	line, error = buffer.ReadString('\n')	// header line...
 	fmt.Println(line, error)
 	// so, can probably look for the last item in the header line
 	// and then do a ReadString('COMPLETIONTIME\n') type of thing...
@@ -147,11 +176,23 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 
 // TODO(emepetres): can be optimised doing at the same time Trim+alloc
 func squeueLineParser(line string) []string {
-	// // check if line is long enough
+	// check if line is long enough
+	fields := [13]string{"JOBID", "S", "CCODE", "PAR", "EFFIC", "XFACTOR", "Q", "USERNAME", "GROUP", "MHOST", "PROCS", "WALLTIME", "COMPLETIONTIME"}
+	nchars := [13]int{20, 2, 14, 5, 7, 9, 3, 12, 17, 6, 9, 16, 14}
+	count := 0
+	for idx, nc := range nchars {
+		count += nc
+	}
+	fmt.Println(count)
+
 	// if len(line) < 20*(qFIELDS-1)+1 {
 	// 	log.Warnln("Slurm line not long enough: \"" + line + "\"")
 	// 	return nil
 	// }
+	if len(line) < count {
+		log.Warnln("Torque line not long enough: \"" + line + "\"")
+		return nil
+	}
 
 	// separate fields by 20 chars, trimming them
 	result := make([]string, 0, qFIELDS)
