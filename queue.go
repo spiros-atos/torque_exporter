@@ -121,9 +121,10 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 // spiros end
 
 	// remove already registered map memory from sacct when finished
-	lastJob := ""
+	// lastJob := ""
 	nextLine := nextLineIterator(sshSession.OutBuffer, squeueLineParser)
-	for fields, err := nextLine(); err == nil; fields, err = nextLine() {
+	// for fields, err := nextLine(); err == nil; fields, err = nextLine() {
+	for _, err := nextLine(); err == nil; _, err = nextLine() {
 		// check the line is correctly parsed
 		if err != nil {
 			log.Warnln(err.Error())
@@ -177,10 +178,11 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 // TODO(emepetres): can be optimised doing at the same time Trim+alloc
 func squeueLineParser(line string) []string {
 	// check if line is long enough
-	fields := [13]string{"JOBID", "S", "CCODE", "PAR", "EFFIC", "XFACTOR", "Q", "USERNAME", "GROUP", "MHOST", "PROCS", "WALLTIME", "COMPLETIONTIME"}
+	// fields := [13]string{"JOBID", "S", "CCODE", "PAR", "EFFIC", "XFACTOR", "Q", "USERNAME", "GROUP", "MHOST", "PROCS", "WALLTIME", "COMPLETIONTIME"}
 	nchars := [13]int{20, 2, 14, 5, 7, 9, 3, 12, 17, 6, 9, 16, 14}
 	count := 0
-	for idx, nc := range nchars {
+	// for idx, nc := range nchars {
+	for _, nc := range nchars {
 		count += nc
 	}
 	fmt.Println(count)
