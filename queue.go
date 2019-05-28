@@ -38,7 +38,8 @@ const (
 
 const (
 	slurmLayout   = time.RFC3339
-	queueCommand  = "squeue -h -Ojobid,name,username,partition,numcpus,submittime,starttime,state -P"
+//	queueCommand  = "squeue -h -Ojobid,name,username,partition,numcpus,submittime,starttime,state -P"
+	queueCommand  = "showq -c"
 	nullStartTime = "N/A"
 )
 
@@ -78,6 +79,17 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 
 	// wait for stdout to fill (it is being filled async by ssh)
 	time.Sleep(100 * time.Millisecond)
+
+// spiros start
+	var buffer := sshSession.OutBuffer
+	line, error := buffer.ReadString('\n')	// new line
+	line, error := buffer.ReadString('\n')	// completed jobs-----
+	line, error := buffer.ReadString('\n')	// new line
+	line, error := buffer.ReadString('\n')	// header line...
+	fmt.Println(line, error)
+	// so, can probably look for the last item in the header line
+	// and then do a ReadString('COMPLETIONTIME\n') type of thing...
+// spiros end
 
 	// remove already registered map memory from sacct when finished
 	lastJob := ""
