@@ -110,7 +110,7 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 	time.Sleep(100 * time.Millisecond)
 
 // spiros start
-	var buffer := sshSession.OutBuffer
+	var buffer = sshSession.OutBuffer
 	line, error := buffer.ReadString('\n')	// new line
 	line, error = buffer.ReadString('\n')	// completed jobs-----
 	line, error = buffer.ReadString('\n')	// new line
