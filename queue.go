@@ -130,46 +130,46 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 			continue
 		}
 
-		// parse submittime
-		submittime, stErr := time.Parse(slurmLayout, fields[qSUBMITTIME]+"Z")
-		if stErr != nil {
-			log.Warnln(stErr.Error())
-			continue
-		}
+		// // parse submittime
+		// submittime, stErr := time.Parse(slurmLayout, fields[qSUBMITTIME]+"Z")
+		// if stErr != nil {
+		// 	log.Warnln(stErr.Error())
+		// 	continue
+		// }
 
-		// parse and send job state
-		status, statusOk := StatusDict[fields[qSTATE]]
-		if statusOk {
-			if lastJob != fields[qJOBID] {
-				ch <- prometheus.MustNewConstMetric(
-					sc.status,
-					prometheus.GaugeValue,
-					float64(status),
-					fields[qJOBID], fields[qNAME], fields[qUSERNAME], fields[qPARTITION],
-				)
-				lastJob = fields[qJOBID]
-				collected++
-			}
+		// // parse and send job state
+		// status, statusOk := StatusDict[fields[qSTATE]]
+		// if statusOk {
+		// 	if lastJob != fields[qJOBID] {
+		// 		ch <- prometheus.MustNewConstMetric(
+		// 			sc.status,
+		// 			prometheus.GaugeValue,
+		// 			float64(status),
+		// 			fields[qJOBID], fields[qNAME], fields[qUSERNAME], fields[qPARTITION],
+		// 		)
+		// 		lastJob = fields[qJOBID]
+		// 		collected++
+		// 	}
 
-			// parse starttime and send wait time
-			if fields[qSTARTTIME] != nullStartTime {
-				starttime, sstErr := time.Parse(slurmLayout, fields[qSTARTTIME]+"Z")
-				if sstErr == nil {
-					waitTimestamp := starttime.Unix() - submittime.Unix()
-					ch <- prometheus.MustNewConstMetric(
-						sc.waitTime,
-						prometheus.GaugeValue,
-						float64(waitTimestamp),
-						fields[qJOBID], fields[qNAME], fields[qUSERNAME],
-						fields[qPARTITION], fields[qNUMCPUS], fields[qSTATE],
-					)
-				} else {
-					log.Warn(sstErr.Error())
-				}
-			}
-		} else {
-			log.Warnf("Couldn't parse job status: %s", fields[qSTATE])
-		}
+		// 	// parse starttime and send wait time
+		// 	if fields[qSTARTTIME] != nullStartTime {
+		// 		starttime, sstErr := time.Parse(slurmLayout, fields[qSTARTTIME]+"Z")
+		// 		if sstErr == nil {
+		// 			waitTimestamp := starttime.Unix() - submittime.Unix()
+		// 			ch <- prometheus.MustNewConstMetric(
+		// 				sc.waitTime,
+		// 				prometheus.GaugeValue,
+		// 				float64(waitTimestamp),
+		// 				fields[qJOBID], fields[qNAME], fields[qUSERNAME],
+		// 				fields[qPARTITION], fields[qNUMCPUS], fields[qSTATE],
+		// 			)
+		// 		} else {
+		// 			log.Warn(sstErr.Error())
+		// 		}
+		// 	}
+		// } else {
+		// 	log.Warnf("Couldn't parse job status: %s", fields[qSTATE])
+		// }
 	}
 	log.Infof("%d queued jobs collected", collected)
 }
