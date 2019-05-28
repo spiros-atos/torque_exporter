@@ -201,10 +201,10 @@ func squeueLineParser(line string) []string {
 	}
 	result = append(result, strings.TrimSpace(line[20*(qFIELDS-1):]))
 
-	// add + to the end of the name if it is long enough
-	if len(result[qNAME]) == 20 {
-		result[qNAME] = result[qNAME][:19] + "+"
-	}
+	// // add + to the end of the name if it is long enough
+	// if len(result[qNAME]) == 20 {
+	// 	result[qNAME] = result[qNAME][:19] + "+"
+	// }
 
 	return result
 }
