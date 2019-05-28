@@ -137,9 +137,9 @@ func (sc *SlurmCollector) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	sc.collectAcct(ch)
+	// sc.collectAcct(ch)
 	sc.collectQueue(ch)
-	sc.collectInfo(ch)
+	// sc.collectInfo(ch)
 
 	err = sc.sshClient.Close()
 	if err != nil {
