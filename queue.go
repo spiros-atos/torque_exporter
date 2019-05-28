@@ -198,19 +198,21 @@ func squeueLineParser(line string) []string {
 
 //	// separate fields by 20 chars, trimming them
 
-	result := make([]string, 0, len(nchars))
+	// result := make([]string, 0, len(nchars))
 	// for i := 0; i < qFIELDS-1; i++ {
 	// 	result = append(result, strings.TrimSpace(line[20*i:20*(i+1)]))
 	// }
 	// result = append(result, strings.TrimSpace(line[20*(qFIELDS-1):]))
 
-	start := 0
-	for _, nc := range nchars {
-		end := start + nc
-		result = append(result, strings.TrimSpace(line[start:end]))
-		start = end+1
-	}
-	result = append(result, strings.TrimSpace(line[start:]))
+	// start := 0
+	// for _, nc := range nchars {
+	// 	end := start + nc-1
+	// 	result = append(result, strings.TrimSpace(line[start:end]))
+	// 	start = end+1
+	// }
+	// result = append(result, strings.TrimSpace(line[start:]))
+
+	result := strings.Split(line, " ")	
 
 	// // add + to the end of the name if it is long enough
 	// if len(result[qNAME]) == 20 {
