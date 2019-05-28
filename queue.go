@@ -207,7 +207,7 @@ func squeueLineParser(line string) []string {
 	start := 0
 	for _, nc := range nchars {
 		end := start + nc
-		result = append(result, strings.TrimSpace(line[start:end+1]))
+		result = append(result, strings.TrimSpace(line[start:end]))
 		start = end+1
 	}
 	result = append(result, strings.TrimSpace(line[start:]))
