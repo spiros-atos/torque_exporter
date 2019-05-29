@@ -131,10 +131,10 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 // spiros end
 
 	// remove already registered map memory from sacct when finished
-	// lastJob := ""
+	lastJob := ""
 	nextLine := nextLineIterator(sshSession.OutBuffer, squeueLineParser)
 	// for fields, err := nextLine(); err == nil; fields, err = nextLine() {
-	for _, err := nextLine(); err == nil; _, err = nextLine() {
+	for fields, err := nextLine(); err == nil; fields, err = nextLine() {
 		// check the line is correctly parsed
 		if err != nil {
 			log.Warnln(err.Error())
@@ -181,7 +181,7 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 		// 	}
 		// } else {
 		// 	log.Warnf("Couldn't parse job status: %s", fields[qSTATE])
-		// }
+		}
 	}
 	log.Infof("%d queued jobs collected", collected)
 }
