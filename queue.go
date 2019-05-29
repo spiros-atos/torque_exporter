@@ -27,7 +27,7 @@ import (
 const (
 	qJOBID			= iota
 	qS 				= iota
-	qCCODE         	= iota
+//	qCCODE         	= iota
 	qPAR  			= iota
 	qEFFIC  		= iota
 	qXFACTOR  		= iota
@@ -36,8 +36,10 @@ const (
 	qGROUP          = iota
 	qMHOST 			= iota
 	qPROCS    		= iota
-	qWALLTIME       = iota
-	qCOMPLETIONTIME	= iota
+//	qWALLTIME       = iota
+//	qCOMPLETIONTIME	= iota
+	qREMAINING		= iota
+	qSTARTTIME		= iota
 	qFIELDS 		= iota
 )
 
@@ -146,19 +148,20 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 		// 	continue
 		// }
 
-		// // parse and send job state
-		// status, statusOk := StatusDict[fields[qSTATE]]
-		// if statusOk {
-		// 	if lastJob != fields[qJOBID] {
-		// 		ch <- prometheus.MustNewConstMetric(
-		// 			sc.status,
-		// 			prometheus.GaugeValue,
-		// 			float64(status),
-		// 			fields[qJOBID], fields[qNAME], fields[qUSERNAME], fields[qPARTITION],
-		// 		)
-		// 		lastJob = fields[qJOBID]
-		// 		collected++
-		// 	}
+		// parse and send job state
+		status, statusOk := StatusDict[fields[qS]]
+		if statusOk {
+			if lastJob != fields[qJOBID] {
+				ch <- prometheus.MustNewConstMetric(
+					sc.status,
+					prometheus.GaugeValue,
+					float64(status),
+//					fields[qJOBID], fields[qNAME], fields[qUSERNAME], fields[qPARTITION],
+					fields[qJOBID], fields[qUSERNAME], fields[qGROUP], fields[qMHOST],
+				)
+				lastJob = fields[qJOBID]
+				collected++
+			}
 
 		// 	// parse starttime and send wait time
 		// 	if fields[qSTARTTIME] != nullStartTime {
@@ -187,22 +190,22 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 func squeueLineParser(line string) []string {
 	// check if line is long enough
 	// fields := [13]string{"JOBID", "S", "CCODE", "PAR", "EFFIC", "XFACTOR", "Q", "USERNAME", "GROUP", "MHOST", "PROCS", "WALLTIME", "COMPLETIONTIME"}
-	nchars := [13]int{20, 2, 14, 5, 7, 9, 3, 12, 17, 6, 9, 16, 14}
-	count := 0
-	// for idx, nc := range nchars {
-	for _, nc := range nchars {
-		count += nc
-	}
-	fmt.Println(count)
+	// nchars := [13]int{20, 2, 14, 5, 7, 9, 3, 12, 17, 6, 9, 16, 14}
+	// count := 0
+	// // for idx, nc := range nchars {
+	// for _, nc := range nchars {
+	// 	count += nc
+	// }
+	// fmt.Println(count)
 
 	// if len(line) < 20*(qFIELDS-1)+1 {
 	// 	log.Warnln("Slurm line not long enough: \"" + line + "\"")
 	// 	return nil
 	// }
-	if len(line) < count {
-		log.Warnln("Torque line not long enough: \"" + line + "\"")
-		return nil
-	}
+	// if len(line) < count {
+	// 	log.Warnln("Torque line not long enough: \"" + line + "\"")
+	// 	return nil
+	// }
 
 //	// separate fields by 20 chars, trimming them
 
