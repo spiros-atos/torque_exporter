@@ -25,15 +25,6 @@ import (
 )
 
 const (
-	// qJOBID      = iota
-	// qNAME       = iota
-	// qUSERNAME   = iota
-	// qPARTITION  = iota
-	// qNUMCPUS    = iota
-	// qSUBMITTIME = iota
-	// qSTARTTIME  = iota
-	// qSTATE      = iota
-	// qFIELDS     = iota
 	qJOBID			= iota
 	qS 				= iota
 	qCCODE         	= iota
@@ -50,6 +41,8 @@ const (
 	qFIELDS 		= iota
 )
 
+// showq -c:
+
 // JOBID               (15)+5
 // S (1)+1
 // CCODE         (9)+5
@@ -64,11 +57,26 @@ const (
 // WALLTIME        (8)+8
 // COMPLETIONTIME
 
+// showq -r:
+
+// JOBID               
+// S  
+// PAR  
+// EFFIC  
+// XFACTOR  
+// Q  
+// USERNAME    
+// GROUP            
+// MHOST 
+// PROCS   
+// REMAINING            
+// STARTTIME
+
 
 const (
 	slurmLayout   = time.RFC3339
 //	queueCommand  = "squeue -h -Ojobid,name,username,partition,numcpus,submittime,starttime,state -P"
-	queueCommand  = "showq -c"
+	queueCommand  = "showq -r" // -r = active jobs, -c = completed jobs
 	nullStartTime = "N/A"
 )
 
@@ -212,7 +220,7 @@ func squeueLineParser(line string) []string {
 	// }
 	// result = append(result, strings.TrimSpace(line[start:]))
 
-	result := strings.Split(line, " ")	
+	result := strings.Fields(line)	
 
 	// // add + to the end of the name if it is long enough
 	// if len(result[qNAME]) == 20 {
