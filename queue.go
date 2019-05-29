@@ -148,6 +148,10 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 		// 	continue
 		// }
 
+		if len(fields) < qFIELDS-1 {
+			break
+		}
+
 		// parse and send job state
 		status, statusOk := StatusDict[fields[qS]]
 		if statusOk {
