@@ -29,41 +29,50 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// const (
+// 	sBOOTFAIL    = iota
+// 	sCANCELLED   = iota
+// 	sCOMPLETED   = iota
+// 	sCONFIGURING = iota
+// 	sCOMPLETING  = iota
+// 	sFAILED      = iota
+// 	sNODEFAIL    = iota
+// 	sPENDING     = iota
+// 	sPREEMPTED   = iota
+// 	sREVOKED     = iota
+// 	sRUNNING     = iota
+// 	sSPECIALEXIT = iota
+// 	sSTOPPED     = iota
+// 	sSUSPENDED   = iota
+// 	sTIMEOUT     = iota
+// )
+
+// // StatusDict maps string status with its int values
+// var StatusDict = map[string]int{
+// 	"BOOT_FAIL":    sBOOTFAIL,
+// 	"CANCELLED":    sCANCELLED,
+// 	"COMPLETED":    sCOMPLETED,
+// 	"CONFIGURING":  sCONFIGURING,
+// 	"COMPLETING":   sCOMPLETING,
+// 	"FAILED":       sFAILED,
+// 	"NODE_FAIL":    sNODEFAIL,
+// 	"PENDING":      sPENDING,
+// 	"PREEMPTED":    sPREEMPTED,
+// 	"REVOKED":      sREVOKED,
+// 	"RUNNING":      sRUNNING,
+// 	"SPECIAL_EXIT": sSPECIALEXIT,
+// 	"STOPPED":      sSTOPPED,
+// 	"SUSPENDED":    sSUSPENDED,
+// 	"TIMEOUT":      sTIMEOUT,
+// }
+
 const (
-	sBOOTFAIL    = iota
-	sCANCELLED   = iota
-	sCOMPLETED   = iota
-	sCONFIGURING = iota
-	sCOMPLETING  = iota
-	sFAILED      = iota
-	sNODEFAIL    = iota
-	sPENDING     = iota
-	sPREEMPTED   = iota
-	sREVOKED     = iota
-	sRUNNING     = iota
-	sSPECIALEXIT = iota
-	sSTOPPED     = iota
-	sSUSPENDED   = iota
-	sTIMEOUT     = iota
+	sRUNNING	 = iota
 )
 
 // StatusDict maps string status with its int values
 var StatusDict = map[string]int{
-	"BOOT_FAIL":    sBOOTFAIL,
-	"CANCELLED":    sCANCELLED,
-	"COMPLETED":    sCOMPLETED,
-	"CONFIGURING":  sCONFIGURING,
-	"COMPLETING":   sCOMPLETING,
-	"FAILED":       sFAILED,
-	"NODE_FAIL":    sNODEFAIL,
-	"PENDING":      sPENDING,
-	"PREEMPTED":    sPREEMPTED,
-	"REVOKED":      sREVOKED,
-	"RUNNING":      sRUNNING,
-	"SPECIAL_EXIT": sSPECIALEXIT,
-	"STOPPED":      sSTOPPED,
-	"SUSPENDED":    sSUSPENDED,
-	"TIMEOUT":      sTIMEOUT,
+	"R":    sRUNNING,
 }
 
 // SlurmCollector collects metrics from the Slurm queues
