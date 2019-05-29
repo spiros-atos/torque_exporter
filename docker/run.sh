@@ -1,22 +1,16 @@
-#!/bin/bash
+export dockerregistry="registry.test.euxdat.eu/euxdat"
+export service="torque_exporter"
+#export input_folder=$(pwd)/input_test
+#export output_folder=$(pwd)/output
+docker build --rm --force-rm --tag=$service .
+docker pull $dockerregistry/$service:latest
+#docker run -v "$input_folder:/var/data" \
+#  -v "$output_folder:/var/output" \
+#  -e INPUT_RASTERFILE=raster_4326.tif \
+#  -e INPUT_SHAPEFILE=vector_4326.shp \
+#  -e OUTPUT_RASTERFILE=raster_4326_output.tif \
+#  -e OUTPUT_STATISTICSFILE=statistics.json \
+#  $service
+#docker rmi -f $service
+docker run $service -host="hazelhen.hww.de" -ssh-user="xeuspimi" -ssh-password="P1l1nh@01"
 
-if [[ $# < 3 ]] ; then
-    echo 'Usage: '$0' -host=<HOST> -ssh-user=<USER> -ssh-password=<PASSWD> [-countrytz=<TZ>] [-log-level=<LOGLEVEL>]' 
-    exit 1
-fi
-
-ARGS=$1' '$2' '$3
-if [[ $# > 3 ]] ; then
-	ARGS=$ARGS' '$4
-fi
-if [[ $# > 4 ]] ; then
-	ARGS=$ARGS' '$5
-fi
-
-ID=$(docker run --rm -d -p 9100 spiros-atos/torque_exporter $ARGS)
-
-# Get dynamic port in host
-PORT=$(docker ps --no-trunc|grep $ID|sed 's/.*0.0.0.0://g'|sed 's/->.*//g')
-#PORT=$(docker-compose port web 80) #Only if using docker-compose, This will give us something like 0.0.0.0:32790.
-
-echo $ID $PORT
