@@ -67,12 +67,14 @@ import (
 // }
 
 const (
-	sRUNNING	 = iota
+	sRUNNING	= iota
+	sCOMPLETED 	= iota 
 )
 
 // StatusDict maps string status with its int values
 var StatusDict = map[string]int{
 	"R":    sRUNNING,
+	"C":    sCOMPLETED,
 }
 
 // SlurmCollector collects metrics from the Slurm queues
