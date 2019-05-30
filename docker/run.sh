@@ -12,7 +12,7 @@ docker pull $dockerregistry/$service:latest
 #  -e OUTPUT_STATISTICSFILE=statistics.json \
 #  $service
 #docker rmi -f $service
-#docker run $service -host="hazelhen.hww.de" -ssh-user="xeuspimi" -ssh-password="P1l1nh@01"
-docker run --rm -d -p 9100 $service -host="hazelhen.hww.de" -ssh-user="xeuspimi" -ssh-password="P1l1nh@01"
+docker run $service -host="hazelhen.hww.de" -ssh-user="xeuspimi" -ssh-password="P1l1nh@01"
+#docker run --rm -d -p 9100 $service -host="hazelhen.hww.de" -ssh-user="xeuspimi" -ssh-password="P1l1nh@01"
 #docker run --rm -d -p 9100 spirosmichalak/torque_exporter $ARGS
 
