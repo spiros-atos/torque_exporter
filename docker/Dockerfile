@@ -3,6 +3,7 @@ FROM golang:1.9-alpine
 LABEL maintainer="spiros.michalakopoulos@atos.net"
 
 RUN mkdir /app
+RUN mkdir /spiros # temp to force a rebuild?
 WORKDIR /app
 
 # Install git
