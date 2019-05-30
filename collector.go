@@ -15,14 +15,40 @@ import (
 )
 
 const (
+	sCOMPLETED	= iota
+	sEXITING	= iota
+	sHELD		= iota
+	sQUEUED		= iota
 	sRUNNING	= iota
-	sCOMPLETED 	= iota 
+	sMOVING		= iota
+	sWAITING	= iota
+	sSUSPENDED	= iota
 )
+
+/*
+from man qstat:
+ -  the job state:
+       C -     Job is completed after having run/
+       E -  Job is exiting after having run.
+       H -  Job is held.
+       Q -  job is queued, eligible to run or routed.
+       R -  job is running.
+       T -  job is being moved to new location.
+       W -  job is waiting for its execution time
+            (-a option) to be reached.
+       S -  (Unicos only) job is suspend.
+*/
 
 // StatusDict maps string status with its int values
 var StatusDict = map[string]int{
-	"R":    sRUNNING,
 	"C":    sCOMPLETED,
+	"E":	sEXITING,
+	"H":	sHELD,
+	"Q":	sQUEUED,
+	"R":    sRUNNING,
+	"T":    sMOVING,
+	"W":    sWAITING,
+	"S":    sSUSPENDED,
 }
 
 type TorqueCollector struct {

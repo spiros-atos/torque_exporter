@@ -93,7 +93,7 @@ func qstatLineParser(line string) []string {
 	fields := strings.Fields(line)
 
 	if len(fields) < aFIELDS {
-		log.Warnf("qstats line parse failed (%s): %d fields expected, %d parsed", line, aFIELDS, len(fields))
+		log.Warnf("qstat line parse failed (%s): %d fields expected, %d parsed", line, aFIELDS, len(fields))
 		return nil
 	}
 
