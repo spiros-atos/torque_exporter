@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mso4sc/slurm_exporter/ssh"
+	"github.com/spiros-atos/torque_exporter/ssh"
 
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
