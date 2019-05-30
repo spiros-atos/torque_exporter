@@ -8,10 +8,10 @@ WORKDIR /app
 # Install git
 RUN apk add --update --no-cache git
 
-# Get slurm exporter
+# Get torque exporter
 RUN go get github.com/spiros-atos/torque_exporter
 
-# Install slurm exporter
+# Install torque exporter
 RUN /bin/sh $GOPATH/src/github.com/spiros-atos/torque_exporter/utils/install.sh
 
 EXPOSE 9100
