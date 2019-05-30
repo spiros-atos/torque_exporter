@@ -94,7 +94,7 @@ func (sc *TorqueCollector) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	// sc.collectAcct(ch)
+	sc.collectQstat(ch)
 	sc.collectQueue(ch)
 	// sc.collectInfo(ch)
 
