@@ -2,7 +2,8 @@ export dockerregistry="registry.test.euxdat.eu/euxdat"
 export service="torque_exporter"
 #export input_folder=$(pwd)/input_test
 #export output_folder=$(pwd)/output
-docker build --no-cache --rm --force-rm --tag=$service .
+docker build --rm --force-rm --tag=$service .
+#docker build --no-cache --rm --force-rm --tag=$service .
 docker pull $dockerregistry/$service:latest
 #docker run -v "$input_folder:/var/data" \
 #  -v "$output_folder:/var/output" \
