@@ -86,7 +86,8 @@ func (sc *TorqueCollector) collectQstat(ch chan<- prometheus.Metric) {
 }
 
 func jobIsNotInQueue(state int) bool {
-	return state != sPENDING && state != sRUNNING && state != sCOMPLETING
+	// return state != sPENDING && state != sRUNNING && state != sCOMPLETING
+	return state != sEXITING && state != sQUEUED && state != sRUNNING
 }
 
 func qstatLineParser(line string) []string {
