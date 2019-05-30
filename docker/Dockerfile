@@ -3,7 +3,6 @@ FROM golang:1.9-alpine
 LABEL maintainer="spiros.michalakopoulos@atos.net"
 
 RUN mkdir /app
-RUN mkdir /spiros # temp to force a rebuild?
 WORKDIR /app
 
 # Install git
@@ -18,9 +17,4 @@ RUN /bin/sh $GOPATH/src/github.com/spiros-atos/torque_exporter/utils/install.sh
 EXPOSE 9100
 
 #ENTRYPOINT ["torque_exporter", "-listen-address", ":9100"]
-#ENTRYPOINT ["torque_exporter", "-host=\"hazelhen.hww.de\"", "-ssh-user=\"xeuspimi\"", "-ssh-password=\"P1l1nh@01\"" , "-listen-address", ":9101"]
-#CMD "\$GOPATH/bin/torque_exporter -host=\"hazelhen.hww.de\" -ssh-user=\"xeuspimi\" -ssh-password=\"P1l1nh@01\""
-#CMD ["$GOPATH/bin/torque_exporter"]
 CMD ["torque_exporter", "-host=hazelhen.hww.de", "-ssh-user=xeuspimi", "-ssh-password=P1l1nh@01"]
-#CMD ls -l 
-
