@@ -1,18 +1,3 @@
-// Copyright (c) 2017 MSO4SC - javier.carnero@atos.net
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-// Slurm collector
-
 package main
 
 import (
@@ -29,43 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// const (
-// 	sBOOTFAIL    = iota
-// 	sCANCELLED   = iota
-// 	sCOMPLETED   = iota
-// 	sCONFIGURING = iota
-// 	sCOMPLETING  = iota
-// 	sFAILED      = iota
-// 	sNODEFAIL    = iota
-// 	sPENDING     = iota
-// 	sPREEMPTED   = iota
-// 	sREVOKED     = iota
-// 	sRUNNING     = iota
-// 	sSPECIALEXIT = iota
-// 	sSTOPPED     = iota
-// 	sSUSPENDED   = iota
-// 	sTIMEOUT     = iota
-// )
-
-// // StatusDict maps string status with its int values
-// var StatusDict = map[string]int{
-// 	"BOOT_FAIL":    sBOOTFAIL,
-// 	"CANCELLED":    sCANCELLED,
-// 	"COMPLETED":    sCOMPLETED,
-// 	"CONFIGURING":  sCONFIGURING,
-// 	"COMPLETING":   sCOMPLETING,
-// 	"FAILED":       sFAILED,
-// 	"NODE_FAIL":    sNODEFAIL,
-// 	"PENDING":      sPENDING,
-// 	"PREEMPTED":    sPREEMPTED,
-// 	"REVOKED":      sREVOKED,
-// 	"RUNNING":      sRUNNING,
-// 	"SPECIAL_EXIT": sSPECIALEXIT,
-// 	"STOPPED":      sSTOPPED,
-// 	"SUSPENDED":    sSUSPENDED,
-// 	"TIMEOUT":      sTIMEOUT,
-// }
-
 const (
 	sRUNNING	= iota
 	sCOMPLETED 	= iota 
@@ -77,8 +25,7 @@ var StatusDict = map[string]int{
 	"C":    sCOMPLETED,
 }
 
-// SlurmCollector collects metrics from the Slurm queues
-type SlurmCollector struct {
+type TorqueCollector struct {
 	waitTime          *prometheus.Desc
 	status            *prometheus.Desc
 	partitionNodes    *prometheus.Desc
@@ -89,9 +36,8 @@ type SlurmCollector struct {
 	lasttime          time.Time
 }
 
-// NewSlurmCollector creates a new Slurm Queue collector
-func NewSlurmCollector(host, sshUser, sshPass, timeZone string) *SlurmCollector {
-	newSlurmCollector := &SlurmCollector{
+func NewTorqueCollector(host, sshUser, sshPass, timeZone string) *TorqueCollector {
+	newTorqueCollector := &TorqueCollector{
 		waitTime: prometheus.NewDesc(
 			"job_wait_time",
 			"Time that the job waited, or is estimated to wait",
@@ -120,18 +66,18 @@ func NewSlurmCollector(host, sshUser, sshPass, timeZone string) *SlurmCollector 
 		alreadyRegistered: make([]string, 0),
 	}
 	var err error
-	newSlurmCollector.timeZone, err = time.LoadLocation(timeZone)
+	newTorqueCollector.timeZone, err = time.LoadLocation(timeZone)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	newSlurmCollector.setLastTime()
-	return newSlurmCollector
+	newTorqueCollector.setLastTime()
+	return newTorqueCollector
 }
 
 // Describe sends metrics descriptions of this collector
 // through the ch channel.
 // It implements collector interface
-func (sc *SlurmCollector) Describe(ch chan<- *prometheus.Desc) {
+func (sc *TorqueCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- sc.waitTime
 	ch <- sc.status
 	ch <- sc.partitionNodes
@@ -140,7 +86,7 @@ func (sc *SlurmCollector) Describe(ch chan<- *prometheus.Desc) {
 // Collect read the values of the metrics and
 // passes them to the ch channel.
 // It implements collector interface
-func (sc *SlurmCollector) Collect(ch chan<- prometheus.Metric) {
+func (sc *TorqueCollector) Collect(ch chan<- prometheus.Metric) {
 	var err error
 	sc.sshClient, err = sc.sshConfig.NewClient()
 	if err != nil {
@@ -158,7 +104,7 @@ func (sc *SlurmCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 }
 
-func (sc *SlurmCollector) executeSSHCommand(cmd string) (*ssh.SSHSession, error) {
+func (sc *TorqueCollector) executeSSHCommand(cmd string) (*ssh.SSHSession, error) {
 	command := &ssh.SSHCommand{
 		Path: cmd,
 		// Env:    []string{"LC_DIR=/usr"},
@@ -173,11 +119,11 @@ func (sc *SlurmCollector) executeSSHCommand(cmd string) (*ssh.SSHSession, error)
 	return nil, err
 }
 
-func (sc *SlurmCollector) setLastTime() {
+func (sc *TorqueCollector) setLastTime() {
 	sc.lasttime = time.Now().In(sc.timeZone).Add(-1 * time.Minute)
 }
 
-func parseSlurmTime(field string) (uint64, error) {
+func parseTorqueTime(field string) (uint64, error) {
 	var days, hours, minutes, seconds uint64
 	var err error
 
@@ -196,7 +142,7 @@ func parseSlurmTime(field string) (uint64, error) {
 		toParse = slice[1]
 		haveDays = true
 	} else {
-		err = errors.New("Slurm time could not be parsed: " + field)
+		err = errors.New("Torque time could not be parsed: " + field)
 		return 0, err
 	}
 
@@ -238,7 +184,7 @@ func parseSlurmTime(field string) (uint64, error) {
 			return 0, err
 		}
 	} else {
-		err = errors.New("Slurm time could not be parsed: " + field)
+		err = errors.New("Torque time could not be parsed: " + field)
 		return 0, err
 	}
 

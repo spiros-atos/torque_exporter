@@ -1,18 +1,3 @@
-// Copyright (c) 2017 MSO4SC - javier.carnero@atos.net
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-// Queue Slurm collector
-
 package main
 
 import (
@@ -76,13 +61,13 @@ const (
 
 
 const (
-	slurmLayout   = time.RFC3339
+//	slurmLayout   = time.RFC3339
 //	queueCommand  = "squeue -h -Ojobid,name,username,partition,numcpus,submittime,starttime,state -P"
 	queueCommand  = "showq -r" // -r = active jobs, -c = completed jobs
-	nullStartTime = "N/A"
+	// nullStartTime = "N/A"
 )
 
-func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
+func (sc *TorqueCollector) collectQueue(ch chan<- prometheus.Metric) {
 	log.Debugln("Collecting Queue metrics...")
 	var collected uint
 	var currentCommand string
@@ -119,21 +104,22 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 	// wait for stdout to fill (it is being filled async by ssh)
 	time.Sleep(100 * time.Millisecond)
 
-// spiros start
+// spiros start 
+	// 	don't know how to return without header line and blank lines,
+	// 	so jump over them this way for now
+	// TODO: something about this
+	// 	so, can probably look for the last item in the header line
+	// 	and then do a ReadString('COMPLETIONTIME\n') type of thing...
 	var buffer = sshSession.OutBuffer
 	line, error := buffer.ReadString('\n')	// new line
 	line, error = buffer.ReadString('\n')	// completed jobs-----
 	line, error = buffer.ReadString('\n')	// new line
 	line, error = buffer.ReadString('\n')	// header line...
 	fmt.Println(line, error)
-	// so, can probably look for the last item in the header line
-	// and then do a ReadString('COMPLETIONTIME\n') type of thing...
 // spiros end
 
-	// remove already registered map memory from sacct when finished
 	lastJob := ""
 	nextLine := nextLineIterator(sshSession.OutBuffer, squeueLineParser)
-	// for fields, err := nextLine(); err == nil; fields, err = nextLine() {
 	for fields, err := nextLine(); err == nil; fields, err = nextLine() {
 		// check the line is correctly parsed
 		if err != nil {
@@ -190,49 +176,9 @@ func (sc *SlurmCollector) collectQueue(ch chan<- prometheus.Metric) {
 	log.Infof("%d queued jobs collected", collected)
 }
 
-// TODO(emepetres): can be optimised doing at the same time Trim+alloc
 func squeueLineParser(line string) []string {
-	// check if line is long enough
-	// fields := [13]string{"JOBID", "S", "CCODE", "PAR", "EFFIC", "XFACTOR", "Q", "USERNAME", "GROUP", "MHOST", "PROCS", "WALLTIME", "COMPLETIONTIME"}
-	// nchars := [13]int{20, 2, 14, 5, 7, 9, 3, 12, 17, 6, 9, 16, 14}
-	// count := 0
-	// // for idx, nc := range nchars {
-	// for _, nc := range nchars {
-	// 	count += nc
-	// }
-	// fmt.Println(count)
 
-	// if len(line) < 20*(qFIELDS-1)+1 {
-	// 	log.Warnln("Slurm line not long enough: \"" + line + "\"")
-	// 	return nil
-	// }
-	// if len(line) < count {
-	// 	log.Warnln("Torque line not long enough: \"" + line + "\"")
-	// 	return nil
-	// }
-
-//	// separate fields by 20 chars, trimming them
-
-	// result := make([]string, 0, len(nchars))
-	// for i := 0; i < qFIELDS-1; i++ {
-	// 	result = append(result, strings.TrimSpace(line[20*i:20*(i+1)]))
-	// }
-	// result = append(result, strings.TrimSpace(line[20*(qFIELDS-1):]))
-
-	// start := 0
-	// for _, nc := range nchars {
-	// 	end := start + nc-1
-	// 	result = append(result, strings.TrimSpace(line[start:end]))
-	// 	start = end+1
-	// }
-	// result = append(result, strings.TrimSpace(line[start:]))
-
+	// TODO: this works well for all fields except time which has spaces within the field
 	result := strings.Fields(line)	
-
-	// // add + to the end of the name if it is long enough
-	// if len(result[qNAME]) == 20 {
-	// 	result[qNAME] = result[qNAME][:19] + "+"
-	// }
-
 	return result
 }
