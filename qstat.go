@@ -48,7 +48,7 @@ func (sc *TorqueCollector) collectQstat(ch chan<- prometheus.Metric) {
 		defer sshSession.Close()
 	}
 	if err != nil {
-		log.Errorf("qstat: %s", err.Error())
+		log.Errorf("qstat: %s ", err.Error())
 		return
 	}
 
