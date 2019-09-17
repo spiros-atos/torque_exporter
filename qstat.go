@@ -1,5 +1,5 @@
-
-package main
+// package main
+package torque_exporter
 
 import (
 	// "fmt"
