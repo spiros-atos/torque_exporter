@@ -39,7 +39,8 @@ func (sc *TorqueCollector) collectQstat(ch chan<- prometheus.Metric) {
 		second = 0
 	}
 
-	currentCommand := fmt.Sprintf(qstatCommand, hour, minute, second)
+	// currentCommand := fmt.Sprintf(qstatCommand, hour, minute, second)
+	currentCommand = qstatCommand
 	log.Debugln(currentCommand)
 
 	sshSession, err := sc.executeSSHCommand(currentCommand)
