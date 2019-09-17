@@ -100,6 +100,44 @@ func NewTorqueCollector(host, sshUser, sshPass, timeZone string) *TorqueCollecto
 	return newTorqueCollector
 }
 
+func NewerTorqueCollector(host, sshUser, sshPass, timeZone string) *TorqueCollector {
+	newerTorqueCollector := &TorqueCollector{
+		waitTime: prometheus.NewDesc(
+			"te_showq",
+			"torque's queue",
+			[]string{"jobid", "name", "username", "partition", "numcpus", "state"},
+			nil,
+		),
+		status: prometheus.NewDesc(
+			"te_qstat_u",
+			"user's jobs",
+			[]string{"jobid", "name", "username", "partition"},
+			nil,
+		),
+		partitionNodes: prometheus.NewDesc(
+			"te_qstat_f",
+			"job details",
+			[]string{"partition", "availability", "state"},
+			nil,
+		),
+		sshConfig: ssh.NewSSHConfigByPassword(
+			sshUser,
+			sshPass,
+			host,
+			22,
+		),
+		sshClient:         nil,
+		alreadyRegistered: make([]string, 0),
+	}
+	var err error
+	newerTorqueCollector.timeZone, err = time.LoadLocation(timeZone)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	newerTorqueCollector.setLastTime()
+	return newerTorqueCollector
+}
+
 // Describe sends metrics descriptions of this collector
 // through the ch channel.
 // It implements collector interface
@@ -121,7 +159,7 @@ func (sc *TorqueCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	sc.collectQstat(ch)
-	sc.collectQueue(ch)
+	// sc.collectQueue(ch)
 	// sc.collectInfo(ch)
 
 	err = sc.sshClient.Close()

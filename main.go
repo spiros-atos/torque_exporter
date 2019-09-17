@@ -70,7 +70,8 @@ func main() {
 	}
 
 	// prometheus.MustRegister(NewSlurmCollector(*host, *sshUser, *sshPass, *countryTZ))
-	prometheus.MustRegister(NewTorqueCollector(*host, *sshUser, *sshPass, *countryTZ))
+	// prometheus.MustRegister(NewTorqueCollector(*host, *sshUser, *sshPass, *countryTZ))
+	prometheus.MustRegister(NewerTorqueCollector(*host, *sshUser, *sshPass, *countryTZ))
 
 	// Expose the registered metrics via HTTP.
 	log.Infof("Starting Server: %s", *addr)
