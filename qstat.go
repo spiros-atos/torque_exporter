@@ -2,7 +2,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"strings"
 	"time"
 
@@ -28,16 +28,16 @@ func (sc *TorqueCollector) collectQstat(ch chan<- prometheus.Metric) {
 	log.Debugln("Collecting qstat metrics...")
 	var collected uint
 
-	hour := sc.lasttime.Hour()
-	minute := sc.lasttime.Minute()
-	second := sc.lasttime.Second()
+	// hour := sc.lasttime.Hour()
+	// minute := sc.lasttime.Minute()
+	// second := sc.lasttime.Second()
 
-	now := time.Now().In(sc.timeZone)
-	if now.Hour() < hour {
-		hour = 0
-		minute = 0
-		second = 0
-	}
+	// now := time.Now().In(sc.timeZone)
+	// if now.Hour() < hour {
+	// 	hour = 0
+	// 	minute = 0
+	// 	second = 0
+	// }
 
 	// currentCommand := fmt.Sprintf(qstatCommand, hour, minute, second)
 	currentCommand := qstatCommand
