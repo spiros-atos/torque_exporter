@@ -52,8 +52,11 @@ var StatusDict = map[string]int{
 }
 
 type TorqueCollector struct {
-	waitTime          *prometheus.Desc
-	status            *prometheus.Desc
+	// waitTime          *prometheus.Desc
+	// status            *prometheus.Desc
+	queueRunning      *prometheus.Desc
+	userJobs          *prometheus.Desc
+	// jobDetails        *prometheus.Desc
 	partitionNodes    *prometheus.Desc
 	sshConfig         *ssh.SSHConfig
 	sshClient         *ssh.SSHClient
@@ -62,58 +65,74 @@ type TorqueCollector struct {
 	lasttime          time.Time
 }
 
-func NewTorqueCollector(host, sshUser, sshPass, timeZone string) *TorqueCollector {
-	newTorqueCollector := &TorqueCollector{
-		waitTime: prometheus.NewDesc(
-			"job_wait_time",
-			"Time that the job waited, or is estimated to wait",
-			[]string{"jobid", "name", "username", "partition", "numcpus", "state"},
-			nil,
-		),
-		status: prometheus.NewDesc(
-			"job_status",
-			"Status of the job",
-			[]string{"jobid", "name", "username", "partition"},
-			nil,
-		),
-		partitionNodes: prometheus.NewDesc(
-			"partition_nodes",
-			"Nodes of the partition",
-			[]string{"partition", "availability", "state"},
-			nil,
-		),
-		sshConfig: ssh.NewSSHConfigByPassword(
-			sshUser,
-			sshPass,
-			host,
-			22,
-		),
-		sshClient:         nil,
-		alreadyRegistered: make([]string, 0),
-	}
-	var err error
-	newTorqueCollector.timeZone, err = time.LoadLocation(timeZone)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	newTorqueCollector.setLastTime()
-	return newTorqueCollector
-}
+// func NewTorqueCollector(host, sshUser, sshPass, timeZone string) *TorqueCollector {
+// 	newTorqueCollector := &TorqueCollector{
+// 		waitTime: prometheus.NewDesc(
+// 			"job_wait_time",
+// 			"Time that the job waited, or is estimated to wait",
+// 			[]string{"jobid", "name", "username", "partition", "numcpus", "state"},
+// 			nil,
+// 		),
+// 		status: prometheus.NewDesc(
+// 			"job_status",
+// 			"Status of the job",
+// 			[]string{"jobid", "name", "username", "partition"},
+// 			nil,
+// 		),
+// 		partitionNodes: prometheus.NewDesc(
+// 			"partition_nodes",
+// 			"Nodes of the partition",
+// 			[]string{"partition", "availability", "state"},
+// 			nil,
+// 		),
+// 		sshConfig: ssh.NewSSHConfigByPassword(
+// 			sshUser,
+// 			sshPass,
+// 			host,
+// 			22,
+// 		),
+// 		sshClient:         nil,
+// 		alreadyRegistered: make([]string, 0),
+// 	}
+// 	var err error
+// 	newTorqueCollector.timeZone, err = time.LoadLocation(timeZone)
+// 	if err != nil {
+// 		log.Fatalln(err.Error())
+// 	}
+// 	newTorqueCollector.setLastTime()
+// 	return newTorqueCollector
+// }
 
 func NewerTorqueCollector(host, sshUser, sshPass, timeZone string) *TorqueCollector {
 	newerTorqueCollector := &TorqueCollector{
-		waitTime: prometheus.NewDesc(
-			"te_showq",
+		queueRunning: prometheus.NewDesc(
+			"te_showq_r",
 			"torque's queue",
-			[]string{"jobid", "name", "username", "partition", "numcpus", "state"},
+			[]string{"jobid", "state", "username", "remaining", "starttime"},
 			nil,
 		),
-		status: prometheus.NewDesc(
+		userJobs: prometheus.NewDesc(
 			"te_qstat_u",
 			"user's jobs",
-			[]string{"jobid", "name", "username", "partition"},
+			[]string{"jobid", "username", "jobname", "status"},
 			nil,
 		),
+		// jobDetails: prometheus.NewDesc(
+		// 	"te_qstat_f",
+		// 	"job details",
+		// 	[]string{"job_name", 
+		// 			 "job_owner", 
+		// 			 "job_state",
+		// 			 "ctime",
+		// 			 "mtime",
+		// 			 "output_path",
+		// 			 "qtime",
+		// 			 "euser",
+		// 			 "queue_type",
+		// 			 "etime",
+		// 			 "submit_args"},
+		// 	nil,
+		// ),
 		partitionNodes: prometheus.NewDesc(
 			"te_qstat_f",
 			"job details",
@@ -142,8 +161,11 @@ func NewerTorqueCollector(host, sshUser, sshPass, timeZone string) *TorqueCollec
 // through the ch channel.
 // It implements collector interface
 func (sc *TorqueCollector) Describe(ch chan<- *prometheus.Desc) {
-	ch <- sc.waitTime
-	ch <- sc.status
+	// ch <- sc.waitTime
+	// ch <- sc.status
+	ch <- sc.queueRunning
+	ch <- sc.userJobs
+	// ch <- sc.jobDetails
 	ch <- sc.partitionNodes
 }
 
@@ -159,7 +181,7 @@ func (sc *TorqueCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	sc.collectQstat(ch)
-	// sc.collectQueue(ch)
+	sc.collectQueue(ch)
 	// sc.collectInfo(ch)
 
 	err = sc.sshClient.Close()

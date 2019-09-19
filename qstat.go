@@ -20,7 +20,7 @@ const (
 	aTSK       = iota
 	aREQDMEM   = iota
 	aREQDTIME  = iota
-	aSTATUS    = iota
+	aS         = iota
 	aELAPTIME  = iota
 	aFIELDS    = iota
 )
@@ -96,23 +96,27 @@ func (sc *TorqueCollector) collectQstat(ch chan<- prometheus.Metric) {
 
 		// parse and send job state
 		// status, statusOk := StatusDict[fields[aSTATE]]
-		status, statusOk := StatusDict[fields[aSTATUS]]
+		status, statusOk := StatusDict[fields[aS]]
 		if statusOk {
-			if jobIsNotInQueue(status) {
-				ch <- prometheus.MustNewConstMetric(
-					sc.status,
-					prometheus.GaugeValue,
-					float64(status),
-					// fields[aJOBID], fields[aNAME], fields[aUSERNAME], fields[aPARTITION],
-					fields[aJOBID], fields[aJOBNAME], fields[aUSERNAME], fields[aQUEUE],
-				)
-				sc.alreadyRegistered = append(sc.alreadyRegistered, fields[aJOBID])
-				//log.Debugln("Job " + fields[aJOBID] + " finished with state " + fields[aSTATE])
-				collected++
-			}
+			// if jobIsNotInQueue(status) {
+			ch <- prometheus.MustNewConstMetric(
+				sc.userJobs,
+				prometheus.GaugeValue,
+				float64(status),
+				// fields[aJOBID], fields[aNAME], fields[aUSERNAME], fields[aPARTITION],
+				// fields[aJOBID], fields[aJOBNAME], fields[aUSERNAME], fields[aQUEUE],
+				fields[aJOBID], 
+				fields[aUSERNAME], 
+				fields[aJOBNAME], 
+				fields[aS],
+			)
+			sc.alreadyRegistered = append(sc.alreadyRegistered, fields[aJOBID])
+			//log.Debugln("Job " + fields[aJOBID] + " finished with state " + fields[aSTATE])
+			collected++
+			// }
 		} else {
 			// log.Warnf("Couldn't parse job status: '%s', fields '%s'", fields[aSTATE], strings.Join(fields, "|"))
-			log.Warnf("Couldn't parse job status: '%s', fields '%s'", fields[aSTATUS], strings.Join(fields, "|"))
+			log.Warnf("Couldn't parse job status: '%s', fields '%s'", fields[aS], strings.Join(fields, "|"))
 		}
 	}
 

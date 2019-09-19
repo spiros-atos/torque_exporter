@@ -143,11 +143,17 @@ func (sc *TorqueCollector) collectQueue(ch chan<- prometheus.Metric) {
 		if statusOk {
 			if lastJob != fields[qJOBID] {
 				ch <- prometheus.MustNewConstMetric(
-					sc.status,
+					// sc.status,
+					sc.queueRunning,
 					prometheus.GaugeValue,
 					float64(status),
 //					fields[qJOBID], fields[qNAME], fields[qUSERNAME], fields[qPARTITION],
-					fields[qJOBID], fields[qUSERNAME], fields[qGROUP], fields[qMHOST],
+					// fields[qJOBID], fields[qUSERNAME], fields[qGROUP], fields[qMHOST],
+					fields[qJOBID], 
+					fields[qS], 
+					fields[qUSERNAME], 
+					fields[qREMAINING],
+					fields[qSTARTTIME],
 				)
 				lastJob = fields[qJOBID]
 				collected++
